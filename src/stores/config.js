@@ -16,8 +16,6 @@ export const useConfigStore = defineStore('config', () => {
   const state = Number(route.query.state)
   const leaderboard = route.query.leaderboard === 'true'
 
-  console.log('Leaderboard:', leaderboard)
-
   const isExpanded = ref(false)
   const isExtra = ref(false)
   const isLatest = ref(false)

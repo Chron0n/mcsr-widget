@@ -55,7 +55,7 @@ const intervalID = setInterval(toggleLatest, (configStore.rate * 1000) / 2)
 switch (configStore.state) {
   case 1:
     clearInterval(intervalID)
-    setInterval(() => (configStore.isLatest = !configStore.isLatest), configStore.rate * 1000 + 20)
+    setInterval(() => (configStore.isLatest = !configStore.isLatest), configStore.rate * 1000)
     break
   case 2:
     clearInterval(intervalID)
