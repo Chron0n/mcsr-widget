@@ -39,19 +39,19 @@ const variants = {
   },
   visible: {
     scale: 1,
-    height: configStore.leaderboard ? 64 : 48,
-    width: 226,
-    padding: '0.5rem 1rem',
+    height: 78,
+    width: configStore.leaderboard ? 290 : 226,
+    padding: configStore.leaderboard ? '0rem 0.5rem 0rem 0.8rem' : '0.5rem 1rem',
   },
   extended: {
     scale: 1,
-    height: 164,
+    height: 78,
     width: 290,
     padding: '1rem 1.5rem',
   },
   extendedExtra: {
     scale: 1,
-    height: 196,
+    height: 78,
     width: 290,
     padding: '1rem 1.5rem',
   },
@@ -105,9 +105,6 @@ onMounted(() => {
         :eloChange="statsStore.eloChange"
         :rankIcon="statsStore.rankIcon"
         :leaderboard="configStore.leaderboard"
-        :wins="statsStore.wins"
-        :loses="statsStore.loses"
-        :winrate="statsStore.winrate"
       />
 
       <ExpandedOverlay
@@ -127,7 +124,6 @@ onMounted(() => {
         :winrate="statsStore.winrate"
         :opponentNickname="statsStore.latestMatchNickname"
         :opponentElo="statsStore.latestMatchElo"
-        :opponentRank="statsStore.latestMatchRank"
         :opponentResult="statsStore.latestMatchResult"
       />
     </motion.div>
@@ -141,7 +137,6 @@ onMounted(() => {
 }
 .widget {
   display: flex;
-  flex-direction: column;
   overflow: hidden;
   gap: 1rem;
   border-radius: 2rem;
