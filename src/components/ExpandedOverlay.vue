@@ -1,27 +1,23 @@
 <script setup>
 import { useConfigStore } from '@/stores/config'
-import { animate, delay, RowValue, useMotionValue, useTransform } from 'motion-v'
+import { delay, RowValue, animate, useMotionValue, useTransform } from 'motion-v'
 import { onUnmounted, watch } from 'vue'
-import LatestMatch from './LatestMatch.vue'
-import TodayStats from './TodayStats.vue'
 import WinrateBadge from './WinrateBadge.vue'
+import { eloChangeFormatter } from '@/lib/eloChangeForametter'
+
+const baseUrl = import.meta.env.BASE_URL
 
 const {
   nickname,
   elo,
   eloRank,
-  rank,
   rankIcon,
   badge,
   accent,
   eloChange,
   wins,
   loses,
-  avg,
   winrate,
-  opponentNickname,
-  opponentElo,
-  opponentResult,
 } = defineProps({
   nickname: String,
   elo: Number,
@@ -37,9 +33,20 @@ const {
   winrate: Number,
   opponentNickname: String,
   opponentElo: Number,
-  opponentRank: Number,
   opponentResult: Number,
 })
+
+const changeCounter = useMotionValue(Math.abs(eloChange))
+const changeRounded = useTransform(() => Math.round(changeCounter.get()))
+
+watch(
+  () => eloChange,
+  (newEloChange) => {
+    animate(changeCounter, Math.abs(newEloChange), {
+      duration: 0.5,
+    })
+  },
+)
 
 const configStore = useConfigStore()
 
@@ -50,12 +57,12 @@ const toggleLatest = () => {
   }, configStore.rate)
 }
 
-const intervalID = setInterval(toggleLatest, (configStore.rate * 1000) / 2)
+const intervalID = setInterval(toggleLatest, (configStore.rate * 1000) / 2 + 20)
 
 switch (configStore.state) {
   case 1:
     clearInterval(intervalID)
-    setInterval(() => (configStore.isLatest = !configStore.isLatest), configStore.rate * 1000)
+    setInterval(() => (configStore.isLatest = !configStore.isLatest), configStore.rate * 1000 + 20)
     break
   case 2:
     clearInterval(intervalID)
@@ -104,7 +111,7 @@ onUnmounted(() => {
       <div class="expanded-info-stats">
         <!-- Elo + leaderboard values -->
         <div class="expanded-info-stats-block">
-          <span class="expanded-info-stats__text"><RowValue :value="eloRounded" /> elo</span>
+          <span class="expanded-info-stats__text">W/L {{ wins || 0 }}/{{ loses || 0 }} • rank</span>
           <div class="expanded-info-stats-leader expanded-info-stats__text">
             <span class="expanded-info-stats__hashtag">#</span>
             <RowValue class="expanded-info-stats__text" :value="leaderboardRounded" />
@@ -112,12 +119,22 @@ onUnmounted(() => {
         </div>
 
         <div class="expanded-info-stats-rank">
-          <span class="expanded-info-stats-rank__text">{{ rank }}</span>
           <img
-            :src="`/icons/${rankIcon || 'coal'}.png`"
+            :src="`${baseUrl}icons/${rankIcon || 'coal'}.png`"
             alt="rank icon"
             class="expanded-info-stats-rank__icon"
           />
+          <span class="expanded-info-stats-rank__text"><RowValue :value="eloRounded" /> elo </span>
+
+      <span
+        class="miminized-info__text"
+        :class="{
+          'miminized-info__text--positive': eloChange > 0,
+          'miminized-info__text--negative': eloChange < 0,
+        }"
+        >{{ eloChangeFormatter(eloChange) }}<RowValue :value="changeRounded"
+      /></span>
+
         </div>
       </div>
 
@@ -136,14 +153,6 @@ onUnmounted(() => {
       />
     </div>
 
-    <LatestMatch
-      v-if="!configStore.isLatest"
-      :elo="opponentElo"
-      :nickname="opponentNickname"
-      :rank="opponentRank"
-      :result="opponentResult"
-    />
-    <TodayStats v-else :accent="accent" :wins="wins" :loses="loses" :elo="eloChange" :avg="avg" />
   </div>
 </template>
 
@@ -212,8 +221,23 @@ onUnmounted(() => {
   height: 2rem;
 }
 .expanded-info__head {
-  width: 2rem;
-  height: 2rem;
+  width: 3rem;
+  height: 3rem;
   border-radius: 0.25rem;
+}
+.miminized-info__text {
+  color: #a4a4a9;
+  text-align: center;
+  font-size: 1.5rem;
+  margin-left: 10px;
+  font-weight: 600;
+  line-height: 1.5rem;
+  letter-spacing: -0.01488rem;
+}
+.miminized-info__text--positive {
+  color: #37c058;
+}
+.miminized-info__text--negative {
+  color: #fa3532;
 }
 </style>
