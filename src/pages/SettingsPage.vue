@@ -60,7 +60,7 @@ const copyWidgetUrl = () => {
   localStorage.setItem('selectedAccent', selectedAccent.value)
   localStorage.setItem('selectedRate', selectedRate.value)
 
-  const widgetUrl = `${import.meta.env.VITE_HOST}/widget?nickname=${nickname.value}&badge=${selectedBadge.value}&rate=${selectedRate.value}&accent=${selectedAccent.value}&state=${selectedStyle.value}`
+  const widgetUrl = `${window.location.origin}${import.meta.env.BASE_URL}#/widget?nickname=${nickname.value}&badge=${selectedBadge.value}&rate=${selectedRate.value}&accent=${selectedAccent.value}&state=${selectedStyle.value}`
   navigator.clipboard.writeText(widgetUrl)
 
   toast.success(
